@@ -1,1 +1,1 @@
-# js_injector
+# injector
