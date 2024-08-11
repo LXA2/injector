@@ -8,6 +8,7 @@ const http = require('http');
 let requestQueue = []; // 用来存储点击事件的title和num
 
 
+
 let windows = {};
 
 function createWindow(options, id) {
@@ -45,15 +46,16 @@ app.on('ready', () => {
     ipcMain.on('create-window2', (event,url) => {
         if (!windows[url]) {
             const options = {
-                width: 500,
-                height: 1200,
+                width: 720,
+                height: 1920,
                 fullscreen: false,
                 title: "loading",
                 frame: true,
                 alwaysOnTop: false,
                 resizable: true,
                 webPreferences: {
-                    preload: path.resolve(__dirname, './preload2.js')
+                    preload: path.resolve(__dirname, './preload2.js'),
+                    userAgent: 'Mozilla/5.0 (iPad; U; CPU OS 4_2_1 like Mac OS X; zh-cn) AppleWebKit/533.17.9 (KHTML, like Gecko) Version/5.0.2 Mobile/8C148 Safari/6533.18.5',
                 }
             }
             createWindow(options, url);
@@ -105,11 +107,18 @@ app.on('ready', () => {
     }, 0);
     loadContent(1, "./startPage.html", 0);
 
+    session.defaultSession.clearStorageData({
+        storages: ['cookies']
+    }).then(() => {
+        console.log('All cookies cleared');
+    });
+
     const ses = session.defaultSession;
+    console.log("user agent:",ses.getUserAgent());
 
     ses.webRequest.onBeforeRequest((details, callback) =>{
     //ses.webRequest.onCompleted((details) => {
-      if (details.resourceType === 'media') {//if (details.resourceType === 'media') {
+      if (details.resourceType === 'mediaa') {//if (details.resourceType === 'media') {
         console.log('Media request completed:', details);
         
         // 提取文件扩展名
@@ -122,7 +131,7 @@ app.on('ready', () => {
         const extension = cleanFilename.substring(cleanFilename.lastIndexOf('.') + 1);
         const saveFilename = `${num}_${title}.${extension}`;
 
-        const savePath = path.join("D:\\Download\\aaa",saveFilename);
+        const savePath = path.join("E:\\谢涛_听世界\\bbb",saveFilename);
         
         // 根据 URL 协议选择 HTTP 或 HTTPS 模块
         const client = url.protocol === 'https:' ? https : http;
@@ -157,7 +166,7 @@ app.on('window-all-closed', () => {
 async function one(win){
     const pages_btn = Number(await get_num(win, 'page-link N_t'));
     const pages = Number(await get_text(win, 'page-link N_t',(pages_btn-2)));
-    for (let index = 2; index <= pages; index++) {
+    for (let index = 20; index <= pages; index++) {
         while (true) {
             console.log("page index:",index);
             win.webContents.send("simulate-input-class", "control-input N_t", 0,index);
@@ -178,7 +187,7 @@ async function one(win){
             // 将title和num加入队列
             requestQueue.push({ title, num });
             win.webContents.send("simulate-click-class","icon-wrapper _nO",index2);
-            await new Promise(resolve => setTimeout(resolve, 2000));
+            await new Promise(resolve => setTimeout(resolve, 1000));
         }
 
     }
@@ -206,64 +215,3 @@ function get_text(win,className, index) {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-/*
-const request = require('request');
-
-// ---- 下载类 ---- //
-function StreamDownload() {
-    // 声明下载过程回调函数
-    this.downloadCallback = null;
-}
-
-// 下载进度
-StreamDownload.prototype.showProgress = function (received, total) {
-    const percentage = (received * 100) / total;
-    // 用回调显示到界面上
-    this.downloadCallback('progress', percentage);
-};
-
-// 下载过程
-StreamDownload.prototype.downloadFile = function (patchUrl, baseDir, callback, fileName) {
-    this.downloadCallback = callback; // 注册回调函数
-
-    const downloadFile = fileName; // 下载文件名称，也可以从外部传进来
-
-    let receivedBytes = 0;
-    let totalBytes = 0;
-
-    const req = request({
-        method: 'GET',
-        uri: patchUrl
-    });
-
-    const out = fs.createWriteStream(path.join(baseDir, downloadFile));
-    req.pipe(out);
-
-    req.on('response', (data) => {
-        // 更新总文件字节大小
-        totalBytes = parseInt(data.headers['content-length'], 10);
-    });
-
-    req.on('data', (chunk) => {
-        // 更新下载的文件块字节大小
-        receivedBytes += chunk.length;
-        this.showProgress(receivedBytes, totalBytes);
-    });
-
-    req.on('end', () => {
-        console.log('下载已完成，等待处理');
-        this.downloadCallback('finished', 100); // 将完成百分比设为 100
-    });
-}
-*/

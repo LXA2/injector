@@ -47,6 +47,7 @@ window.addEventListener('DOMContentLoaded', () => {
         //console.log("text:",text);
         ipcRenderer.send('get-text-reply', text);
     });
+
 });
 
 
