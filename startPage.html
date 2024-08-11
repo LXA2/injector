@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>喜马拉雅下载器</title>
+</head>
+<style>
+    .main{margin: auto;width: 90vw;margin-top: 25px;text-align: center;user-select: none;}
+    #url{
+        width: 60vw;
+        font-size: 20px;
+    }
+    #input1::before{
+        content: "URL:";
+    }
+    #btn1{
+        margin-top: 10px;
+        font-size: 3vw;
+    }
+</style>
+<body>
+    <div class="main">
+        <div>
+            <input type="url" id="url">
+        </div>
+        <div>
+            <button id="btn1">点击打开页面</button>
+        </div>
+    </div>
+</body>
+<script>
+    let input1=document.getElementById("url");
+    let btn1=document.getElementById("btn1");
+    btn1.addEventListener("click", function(){
+        console.log(input1.value);
+        injector.createWindow2(input1.value);
+    });
+    
+</script>
+</html>
